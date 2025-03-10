@@ -52,6 +52,7 @@ satisfy(
 
    # constraint 4
    [Sum([x[floor(i/9)][i%9] for i in clue[1:]]) == clue[0] for clue in clues]
+   # considérant que les cases sont numérotées de 0 à 80 en row-major, la contrainte est : clue[0] = sum(X[clue[1:]])
 )
 
 # Solve the problem and print the solution if found
