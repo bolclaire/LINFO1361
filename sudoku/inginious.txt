@@ -1,0 +1,18 @@
+Question 1: What is the purpose of the set of constraints #1 ?
+Each row can contain a value only once
+
+Question 2: What is the purpose of the set of constraints #2 ?
+~ column
+
+Question 3:
+~ square
+
+Question 4:
+~ clues
+
+Question 5: What are possible solution values for x[0][0] ? Be careful: we consider complete solutions, not partial assignments.
+ONLY 9 
+(if doubt about a value, try to force it in the clues, the set of constraints becomes unsatisfiable)
+
+Question 6: Alternative problem, which problem is it ?
+Killer Sudoku (https://fr.wikipedia.org/wiki/Killer_sudoku)
