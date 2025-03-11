@@ -3,6 +3,17 @@ from pycsp3 import *
 
 def solve_restricted_gardener(instruction: int, n:int) -> list[int]:
     # Put your code here
+    X = VarArray(size = n, dom=range(1,n+1))
+    sub_x = VarArray(size = n-1, dom=range(0,2))
+
+    satisfy(
+        AllDifferent(X),
+        [sub_x[i-1] == (Maximum(X[:i]) < X[i]) for i in range(1,n)],
+        Sum(sub_x) == instruction-1
+    )
+
+    if solve(solver= CHOCO) is SAT:
+        return values(X)
 
     return None
 
