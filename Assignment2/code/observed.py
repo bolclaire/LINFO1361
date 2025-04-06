@@ -24,19 +24,26 @@ class ObsFenixState:
 
         # scores compris entre 0 et 1
         # value[0] concerne le player (1), value[1] concerne le player(-1)
-        self.has_king                 = [0,0]
-        self.has_general              = [0,0]
-        self.has_soldier              = [0,0]
-        self.has_token                = [0,0]
-        self.could_create_general     = [0,0]
-        self.could_create_king        = [0,0]
-        self.protected_king           = [0,0]
-        self.protected_general        = [0,0]
-        self.mobile_general           = [0,0]
+        self._has_king                 = [0,0]
+        self._has_general              = [0,0]
+        self._has_soldier              = [0,0]
+        self._has_token                = [0,0]
+        self._could_create_general     = [0,0]
+        self._could_create_king        = [0,0]
+        self._protected_king           = [0,0]
+        self._protected_general        = [0,0]
+        self._mobile_general           = [0,0]
+
+        self.compute()
     
-    @staticmethod
-    def _get(score, player):
-        return score[(player+1)==0]
+    def has_king(self, p) :
+        return self._has_king[(p+1)==0]
+    def has_general(self, p) :
+        return self._has_general[(p+1)==0]
+    def has_soldier(self, p) :
+        return self._has_general[(p+1)==0]
+    def has_token(self, p) :
+        return self._has_general[(p+1)==0]
 
     def compute(self) :
         i = 0
@@ -45,19 +52,19 @@ class ObsFenixState:
             if (piece < 0):
                 i = 1
                 piece = -piece
-            self.has_token[i] += piece
-            self.has_soldier[i] += (piece==1)
-            self.has_general[i] += (piece==2)
-            self.has_king   [i] += (piece==3)
+            self._has_token[i] += piece
+            self._has_soldier[i] += (piece==1)
+            self._has_general[i] += (piece==2)
+            self._has_king   [i] += (piece==3)
 
         #    for pos2 in self.pieces :
 
         
         for i in range(2) :
-            self.has_token  [i] = self.has_token  [i] / 21
-            self.has_soldier[i] = self.has_soldier[i] / 12
-            self.has_general[i] = self.has_general[i] / 3
-            self.has_king   [i] = self.has_king   [i] / 1
+            self._has_token  [i] = self._has_token  [i] / 21
+            self._has_soldier[i] = self._has_soldier[i] / 12
+            self._has_general[i] = self._has_general[i] / 3
+            self._has_king   [i] = self._has_king   [i] / 1
 
         return self
     
