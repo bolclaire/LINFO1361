@@ -1,6 +1,6 @@
 import random_agent
 import mcts_agent as agent
-import alphabeta2 as agentab
+import alphabeta as agentab
 from visual_game_manager import *
 from game_manager import *
 

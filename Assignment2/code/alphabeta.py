@@ -1,77 +1,123 @@
 from agent import Agent
-import random
 from fenix import FenixState, FenixAction
 from observed import ObsFenixState
+import random
 import time
+from collections import namedtuple
+
+depth = 10
+
+Coeff = namedtuple('Coeff',['coeff','dir'])
+HeuristicCoeffs = namedtuple('HeuristicCoeffs',\
+                                [\
+                                'has_king', 'has_king_adv', \
+                                'has_general', 'has_general_adv', \
+                                'has_soldier', 'has_soldier_adv', \
+                                'has_token', 'has_token_adv'\
+                                ]\
+                            )
+
+def init_coeffs() :
+    return HeuristicCoeffs._make([None]*len(HeuristicCoeffs._fields))
+
+def mod_coeffs(coeffs:HeuristicCoeffs, dict) :
+    """
+    dict is a dictionary with entries key -> value : 
+    field_to_update:string -> new_coeff:HeuristicCoeff
+    """
+    return coeffs._replace(**dict)
+
+def sanitycheck_coeffs(coeffs:HeuristicCoeffs) :
+    for el in coeffs :
+        if (el != None) :
+            if (el.coeff > 100 or el.coeff < 0) :
+                raise ValueError("Heuristic coefficients should be in [0,100]")
+            if (abs(el.dir) != 1) :
+                raise ValueError("Heuristic coefficients directions should be (1) or (-1)")
+    return('OK : ' + str(coeffs))
+
+def heuristic(coeffs : HeuristicCoeffs, state : ObsFenixState, player : int) :
+    p = player
+    if (state.utility(p) == 1) :
+        return 100
+    if (state.utility(p) == -1) :
+        return 0
+    res = 0
+    N = 0
+    list = [\
+        (coeffs.has_king         , state.has_king    (p)),    \
+        (coeffs.has_king_adv     , state.has_king   (-p)),    \
+        (coeffs.has_general      , state.has_general (p)),    \
+        (coeffs.has_general_adv  , state.has_general(-p)),    \
+        (coeffs.has_soldier      , state.has_soldier (p)),    \
+        (coeffs.has_soldier_adv  , state.has_soldier(-p)),    \
+        (coeffs.has_token        , state.has_token   (p)),    \
+        (coeffs.has_token_adv    , state.has_token  (-p)),    \
+        ]
+    for el in list :
+        if (el[0] != None) :
+            coeff = el[0].coeff
+            dir   = el[0].dir
+            score = el[1]
+            if (dir == -1) :
+                score = 1 - score
+            N += 1
+            res += coeff * score
+    return res/N
+
+def minimax(depth: int, state: ObsFenixState, player: int, is_maxing: bool, alpha, beta, evaluate) -> tuple[FenixAction, float]:
+    if depth == 0 or state.is_terminal():
+        return None, evaluate(state, player) if is_maxing else evaluate(state, -player)
+    
+    if is_maxing:
+        max_eval = -float("inf")
+        best_move = None
+        for action in state.actions():
+            child_board = state.result(action)
+
+            _, eval = minimax(depth-1, child_board, player, not is_maxing, alpha, beta, evaluate)
+
+            if eval > max_eval:
+                max_eval = eval
+                best_move = action
+            
+            alpha = max(alpha, eval)
+            if beta <= alpha:
+                break
+        
+        return best_move, max_eval
+    
+    else:
+        min_eval = float("inf")
+        best_move = None
+        for action in state.actions():
+            child_board = state.result(action)
+
+            _, eval = minimax(depth-1, child_board, player, not is_maxing, alpha, beta, evaluate)
+            
+            if eval < min_eval:
+                min_eval = eval
+                best_move = action
+
+            beta = min(beta, eval)
+            if beta <= alpha:
+                break
+
+        return best_move, min_eval
 
 class AlphaBetaAgent(Agent):
-    depth = 5
+
+    def __init__(self, player, coeffs:HeuristicCoeffs) :
+        Agent.__init__(self, player)
+        self.coeffs = coeffs
+
+    def local_heuristic(self, state, player) :
+        return heuristic(self.coeffs, state, player)
 
     def act(self, state:FenixState, remaining_time):
         start = time.time()
-        best_action = None
-        best_value = -float('inf')
-        alpha = -float('inf')
-        beta = float('inf')
-
-        state = ObsFenixState(state)
-        # make it full of deductions
-
-        if state.turn < 10 :
-            # change to adapt to player action or predefined setup moves
-            return state.actions()[0]
-
-        for action in state.actions() :
-            value = self.min_value(state.result(action), alpha, beta, self.depth - 1)
-            if value > best_value:
-                best_value = value
-                best_action = action
-            alpha = max(alpha, value)
-
+        if state.turn < 10:
+            return random.choice(state.actions())
+        action, _ = minimax(3, ObsFenixState(state), self.player, True, -float("inf"), float("inf"), self.local_heuristic)
         print(time.time() - start)
-        return best_action
-
-    def min_value(self, state:ObsFenixState, alpha, beta, depth):
-        if state.is_terminal() or depth == 0:
-            return self.evaluate(state)
-
-        value = float('inf')
-        for action in state.actions():
-            value = min(value, self.max_value(state.result(action), alpha, beta, depth - 1))
-            if value <= alpha:
-                return value
-            beta = min(beta, value)
-        return value
-
-    def max_value(self, state:ObsFenixState, alpha, beta, depth):
-        if state.is_terminal() or depth == 0:
-            return self.evaluate(state)
-
-        value = float('-inf')
-        for action in state.actions():
-            value = max(value, self.min_value(state.result(action), alpha, beta, depth - 1))
-            if value >= beta:
-                return value
-            alpha = max(alpha, value)
-        return value
-
-    def evaluate(self, state:ObsFenixState):
-        return self.dummy_heuristic(state)
-        
-    def dummy_heuristic(self, state:ObsFenixState) :
-        p = self.player
-        a = 5
-        b = 100
-        c = 0
-        d = -100
-        e = 10000
-        f = 10000
-        value =  a * (1/state.diffusion_factor(p)) \
-            + b * state.has_piece(p)\
-            + c * state.diffusion_factor(-p)\
-            + d * state.has_piece(-p)\
-            + e * state.has_king(p)\
-            + f * (state.has_king(-p) == False)
-        
-        # generaux et roi proches du bord
-        return value
+        return action

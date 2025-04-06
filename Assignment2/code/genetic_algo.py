@@ -1,6 +1,6 @@
 import random
 from game_manager import *
-from alphabeta2 import AlphaBetaAgent
+from alphabeta import AlphaBetaAgent
 
 # Parameters
 POP_SIZE = 100

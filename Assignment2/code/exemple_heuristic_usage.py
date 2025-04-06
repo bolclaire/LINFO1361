@@ -1,5 +1,5 @@
-from alphabeta2 import Coeff, HeuristicCoeffs, init_coeffs, mod_coeffs, sanitycheck_coeffs
-from alphabeta2 import AlphaBetaAgent
+from alphabeta import Coeff, HeuristicCoeffs, init_coeffs, mod_coeffs, sanitycheck_coeffs
+from alphabeta import AlphaBetaAgent
 from game_manager import TextGameManager
 
 H1 = init_coeffs()
