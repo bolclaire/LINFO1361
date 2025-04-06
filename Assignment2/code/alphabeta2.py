@@ -1,6 +1,7 @@
 from agent import Agent
 from fenix import FenixState, FenixAction
 from observed import ObsFenixState
+import random
 import time
 
 depth = 5
@@ -71,7 +72,7 @@ class AlphaBetaAgent(Agent):
         state = ObsFenixState(state)
 
         if state.turn < 10:
-            return state.actions()[0]
-        move, _ = self.minimax(3, ObsFenixState(state), self.player, True, -float("inf"), float("inf"))
+            return random.choice(state.actions())
+        action, _ = minimax(3, ObsFenixState(state), self.player, True, -float("inf"), float("inf"))
         print(time.time() - start)
-        return move
+        return action

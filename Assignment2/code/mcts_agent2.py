@@ -6,6 +6,10 @@ from copy import deepcopy
 import time
 
 class MCTS_Tree:
+    """
+        The tree structure that is used in the exploration of the game tree using mcts
+        to store the wins and total game obtained from descending in that direction
+    """
     def __init__(self, state: FenixState, c_param = 1.4142, parent = None):
         self.state: FenixState = state
         self.actions: list[FenixAction] = state.actions()
@@ -46,6 +50,7 @@ def defaul_descend(root_state: FenixState, player) -> bool:
     return state.utility(player) == 1
 
 def extend(node: MCTS_Tree, player: int) -> bool:
+    # try to extend the tree
     if node.is_terminal:
         return node.state.utility(player) == 1
     index = node.childs.index(None)
@@ -54,7 +59,10 @@ def extend(node: MCTS_Tree, player: int) -> bool:
         node.is_fully_extended = True
     child.total = 1
 
-    result = defaul_descend(child.state, player)
+    try:
+        result = defaul_descend(child.state, player)
+    except:
+        result = False
     if result:
         child.win = 1
     node.childs[index] = child
