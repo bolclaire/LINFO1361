@@ -5,7 +5,7 @@ import time
 
 depth = 5
 def evaluate(state: ObsFenixState, player: int):
-    return dummy_heuristic(state, -player)
+    return dummy_heuristic(state, player)
 
 def dummy_heuristic(state:ObsFenixState, player) :
     p = player
@@ -25,7 +25,7 @@ def dummy_heuristic(state:ObsFenixState, player) :
     # generaux et roi proches du bord
     return value
 
-def minimax(depth: int, state: ObsFenixState, player: int, is_maxing: bool, alpha, beta) -> tuple[FenixAction,float]:
+def minimax(depth: int, state: ObsFenixState, player: int, is_maxing: bool, alpha, beta) -> tuple[FenixAction, float]:
     if depth == 0 or state.is_terminal():
         return None, evaluate(state, player) if is_maxing else evaluate(state, -player)
     
