@@ -1,5 +1,5 @@
 import random_agent
-import mcts_agent2 as agent
+import mcts_agent as agent
 import alphabeta2 as agentab
 from visual_game_manager import *
 from game_manager import *

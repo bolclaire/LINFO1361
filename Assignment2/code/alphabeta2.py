@@ -1,6 +1,7 @@
 from agent import Agent
 from fenix import FenixState, FenixAction
 from observed import ObsFenixState
+import random
 import time
 from collections import namedtuple
 
@@ -116,7 +117,7 @@ class AlphaBetaAgent(Agent):
     def act(self, state:FenixState, remaining_time):
         start = time.time()
         if state.turn < 10:
-            return state.actions()[0]
-        move, _ = minimax(3, ObsFenixState(state), self.player, True, -float("inf"), float("inf"), self.local_heuristic)
+            return random.choice(state.actions())
+        action, _ = minimax(3, ObsFenixState(state), self.player, True, -float("inf"), float("inf"), self.local_heuristic)
         print(time.time() - start)
-        return move
+        return action
