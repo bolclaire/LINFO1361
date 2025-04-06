@@ -25,6 +25,46 @@ def dummy_heuristic(state:ObsFenixState, player) :
     # generaux et roi proches du bord
     return value
 
+def minimax(depth: int, state: ObsFenixState, player: int, is_maxing: bool, alpha, beta) -> tuple[FenixAction,float]:
+    if depth == 0 or state.is_terminal():
+        return None, evaluate(state, player) if is_maxing else evaluate(state, -player)
+    
+    if is_maxing:
+        max_eval = -float("inf")
+        best_move = None
+        for action in state.actions():
+            child_board = state.result(action)
+
+            _, eval = minimax(depth-1, child_board, player, not is_maxing, alpha, beta)
+
+            if eval > max_eval:
+                max_eval = eval
+                best_move = action
+            
+            alpha = max(alpha, eval)
+            if beta <= alpha:
+                break
+        
+        return best_move, max_eval
+    
+    else:
+        min_eval = float("inf")
+        best_move = None
+        for action in state.actions():
+            child_board = state.result(action)
+
+            _, eval = minimax(depth-1, child_board, player, not is_maxing, alpha, beta)
+            
+            if eval < min_eval:
+                min_eval = eval
+                best_move = action
+
+            beta = min(beta, eval)
+            if beta <= alpha:
+                break
+
+        return best_move, min_eval
+
 class AlphaBetaAgent(Agent):
     def act(self, state:FenixState, remaining_time):
         start = time.time()
@@ -35,43 +75,3 @@ class AlphaBetaAgent(Agent):
         move, _ = self.minimax(3, ObsFenixState(state), self.player, True, -float("inf"), float("inf"))
         print(time.time() - start)
         return move
-
-    def minimax(self, depth: int, state: ObsFenixState, player: int, is_maxing: bool, alpha, beta) -> tuple[FenixAction,float]:
-        if depth == 0 or state.is_terminal():
-            return None, evaluate(state, player) if is_maxing else evaluate(state, -player)
-        
-        if is_maxing:
-            max_eval = -float("inf")
-            best_move = None
-            for action in state.actions():
-                child_board = state.result(action)
-
-                _, eval = self.minimax(depth-1, child_board, player, not is_maxing, alpha, beta)
-
-                if eval > max_eval:
-                    max_eval = eval
-                    best_move = action
-                
-                alpha = max(alpha, eval)
-                if beta <= alpha:
-                    break
-            
-            return best_move, max_eval
-        
-        else:
-            min_eval = float("inf")
-            best_move = None
-            for action in state.actions():
-                child_board = state.result(action)
-
-                _, eval = self.minimax(depth-1, child_board, player, not is_maxing, alpha, beta)
-                
-                if eval < min_eval:
-                    min_eval = eval
-                    best_move = action
-
-                beta = min(beta, eval)
-                if beta <= alpha:
-                    break
-
-            return best_move, min_eval
