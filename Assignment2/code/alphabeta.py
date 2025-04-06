@@ -2,24 +2,24 @@ from agent import Agent
 import random
 from fenix import FenixState, FenixAction
 from observed import ObsFenixState
+import time
 
 class AlphaBetaAgent(Agent):
-
-    depth = 3
+    depth = 5
 
     def act(self, state:FenixState, remaining_time):
+        start = time.time()
         best_action = None
-        best_value = float('-inf')
-        alpha = float('-inf')
+        best_value = -float('inf')
+        alpha = -float('inf')
         beta = float('inf')
 
-        state = ObsFenixState(state)  
+        state = ObsFenixState(state)
         # make it full of deductions
 
-        ###
         if state.turn < 10 :
+            # change to adapt to player action or predefined setup moves
             return state.actions()[0]
-        ###
 
         for action in state.actions() :
             value = self.min_value(state.result(action), alpha, beta, self.depth - 1)
@@ -28,6 +28,7 @@ class AlphaBetaAgent(Agent):
                 best_action = action
             alpha = max(alpha, value)
 
+        print(time.time() - start)
         return best_action
 
     def min_value(self, state:ObsFenixState, alpha, beta, depth):
@@ -56,10 +57,7 @@ class AlphaBetaAgent(Agent):
 
     def evaluate(self, state:ObsFenixState):
         return self.dummy_heuristic(state)
-    
-    def random_heuristic(self, state:ObsFenixState) :
-        return random.randint(-10,10)
-    
+        
     def dummy_heuristic(self, state:ObsFenixState) :
         p = self.player
         a = 5

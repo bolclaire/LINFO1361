@@ -6,7 +6,7 @@ from copy import deepcopy
 import time
 
 class MCTS_Tree:
-    def __init__(self, state: FenixState, parent = None):
+    def __init__(self, state: FenixState, c_param = 1.4142, parent = None):
         self.state: FenixState = state
         self.actions: list[FenixAction] = state.actions()
         self.len = len(self.actions)
@@ -16,8 +16,9 @@ class MCTS_Tree:
         self.total = 0
         self.is_fully_extended = False
         self.is_terminal: bool = self.state.is_terminal()
+        self.c_param = c_param
     
-    def best_child(self, c_param: float = 1.4142) -> int:
+    def best_child(self, c_param = 1.4142) -> int:
         best_index = 0
         best_score = 0
         for i in range(len(self.childs)):
@@ -25,7 +26,7 @@ class MCTS_Tree:
             if child == None:
                 return i
             else:
-                score = (child.win / child.total) + c_param * sqrt(log(self.total) / child.total)
+                score = (child.win / child.total) + self.c_param * sqrt(log(self.total) / child.total)
                 if score > best_score:
                     best_index = i
                     best_score = score
@@ -39,8 +40,8 @@ def defaul_descend(root_state: FenixState, player) -> bool:
     state = deepcopy(root_state)
     while not state.is_terminal():
         actions = state.actions()
-        state = state.result(random.choice(actions))
-        # in_place_result(state, random.choice(actions)) # "IndexError: Cannot choose from an empty sequence" ?????????
+        # state = state.result(random.choice(actions))
+        in_place_result(state, random.choice(actions)) # "IndexError: Cannot choose from an empty sequence" ?????????
     
     return state.utility(player) == 1
 
@@ -48,7 +49,7 @@ def extend(node: MCTS_Tree, player: int) -> bool:
     if node.is_terminal:
         return node.state.utility(player) == 1
     index = node.childs.index(None)
-    child = MCTS_Tree(node.state.result(node.actions[index]), node)
+    child = MCTS_Tree(node.state.result(node.actions[index]), node.c_param, node)
     if index+1 == node.len:
         node.is_fully_extended = True
     child.total = 1
@@ -115,21 +116,22 @@ def in_place_result(state: FenixState, action: FenixAction):
         return state
 
 class MCTS(Agent):
-    def __init__(self, player):
+    def __init__(self, player, c_param):
         super().__init__(player)
         self.tree: MCTS_Tree = None
         self.last_hashed_states = []
+        self.c_param = c_param
         
     def act(self, state: FenixState, remaining_time):
         try:
             self.tree = self.tree.childs[self.last_hashed_states.index(hash(state._flatten()))]
         except:
-            self.tree = MCTS_Tree(state)
+            self.tree = MCTS_Tree(state, self.c_param)
             # print("oops, not recovered previous mcts")
 
         start = time.time()
         count = 0
-        while time.time() - start < .5:
+        while time.time() - start < 1.5:
             mcts(self.tree, self.player)
             count += 1
 
