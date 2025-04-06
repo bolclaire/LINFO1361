@@ -2,32 +2,9 @@ from fenix import FenixState, FenixAction
 
 class ObsFenixState:
     """
-    Represents the (deducible) game state from a Fenix state.
+    Represents the (deducible) game state from a Fenix state. All parameters are >=0 and <=1.
 
     Attributes:
-
-    (dumb copy from FenixState)
-    (the A PRIORI useless attributes are marked with #UL)
-    (the NOT YET UNDERSTOOD attributes are marked with #TOEV (to evaluate))
-
-    - Inherited from the observable Fenix state :
-        dim (tuple): The dimensions of the board (rows, columns).
-        pieces (dict): A dictionary mapping (row, column) positions to piece values.
-        turn (int): The current turn count.
-        current_player (int): The player whose turn it is (1 or -1).
-        can_create_general (bool): Flag indicating whether a general can be created.
-        can_create_king (bool): Flag indicating whether a king can be created.
-        precomputed_hash (int or None): Cached hash of the board state.
-        history_boring_turn_hash (list): History of hashes for checking repetitions.
-        boring_turn (int): Counter for turns without a capture (used for draw conditions).
-
-    - Deduced from the observable Fenix state (and evaluated as useful) :
-        has_king(player) (boolean)
-        count_generals(player) (int)
-        has_piece(player) (int)
-        to_move() (int)
-
-    - NOT deducible
 
     """
     def __init__(self, state:FenixState):
@@ -41,21 +18,49 @@ class ObsFenixState:
         self.current_player           = state.current_player
         self.can_create_general       = state.can_create_general
         self.can_create_king          = state.can_create_king
-        self.precomputed_hash         = state.precomputed_hash #UL
-        self.history_boring_turn_hash = state.history_boring_turn_hash #UL
-        self.boring_turn              = state.boring_turn #UL
+        self.precomputed_hash         = state.precomputed_hash
+        self.history_boring_turn_hash = state.history_boring_turn_hash
+        self.boring_turn              = state.boring_turn
 
-    def is_inside(self, position): #UL
-        return 0 <= position[0] < self.dim[0] and 0 <= position[1] < self.dim[1]
+        # scores compris entre 0 et 1
+        # value[0] concerne le player (1), value[1] concerne le player(-1)
+        self.has_king                 = [0,0]
+        self.has_general              = [0,0]
+        self.has_soldier              = [0,0]
+        self.has_token                = [0,0]
+        self.could_create_general     = [0,0]
+        self.could_create_king        = [0,0]
+        self.protected_king           = [0,0]
+        self.protected_general        = [0,0]
+        self.mobile_general           = [0,0]
+    
+    @staticmethod
+    def _get(score, player):
+        return score[(player+1)==0]
 
-    def has_king(self, player):
-        return 3*player in self.pieces.values()
+    def compute(self) :
+        i = 0
+        for pos1 in self.pieces :
+            piece = self.pieces[pos1]
+            if (piece < 0):
+                i = 1
+                piece = -piece
+            self.has_token[i] += piece
+            self.has_soldier[i] += (piece==1)
+            self.has_general[i] += (piece==2)
+            self.has_king   [i] += (piece==3)
 
-    def count_generals(self, player):
-        return list(self.pieces.values()).count(2*player)
+        #    for pos2 in self.pieces :
 
-    def has_piece(self, player):
-        return len([p for p in self.pieces.values() if p * player > 0])
+        
+        for i in range(2) :
+            self.has_token  [i] = self.has_token  [i] / 21
+            self.has_soldier[i] = self.has_soldier[i] / 12
+            self.has_general[i] = self.has_general[i] / 3
+            self.has_king   [i] = self.has_king   [i] / 1
+
+        return self
+    
 
     def setup_actions(self): #UL
         actions = []
