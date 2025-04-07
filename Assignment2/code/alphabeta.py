@@ -146,8 +146,8 @@ class AlphaBetaAgent(Agent):
         # start = time.time()
         if state.turn < 10:
             if (self.starting_policy != None and len(self.starting_policy) == 5) :
-                return filter(self.starting_policy[state.turn//2], state.actions)
-            return random.choice(state.actions)
+                return filter(self.starting_policy[state.turn//2], state.actions())
+            return random.choice(state.actions())
         action, _ = minimax(depth, ObsFenixState(state), self.player, True, -float("inf"), float("inf"), self.local_heuristic)
         # print(time.time() - start)
         return action

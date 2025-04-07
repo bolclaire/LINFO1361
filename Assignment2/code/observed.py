@@ -36,7 +36,9 @@ class ObsFenixState:
         self._endang_general           = [0,0]
         self._endang_soldier           = [0,0]
         self._mobile_general           = [0,0]
-        self.actions
+        
+        # (peux pas être mentionné avant définition, donc -> #)
+        # self.actions
         
         self.compute()
     
@@ -70,7 +72,7 @@ class ObsFenixState:
 
     def compute(self) :
         i = 0
-        self.actions = self.actions()
+        self.actions = self.parent.actions()
         for pos1 in self.pieces :
             piece = self.pieces[pos1]
             if (piece < 0):
@@ -192,14 +194,15 @@ class ObsFenixState:
         """
         return self.parent.to_move()
 
-    def actions(self) -> list[FenixAction]: ## personal modification : state specified
-        """
-        Returns the list of legal actions available in the current state.
+    # ne peut pas posséder une variable et une méthode de même nom
+    # def actions(self) -> list[FenixAction]: ## personal modification : state specified
+    #     """
+    #     Returns the list of legal actions available in the current state.
 
-        Returns:
-            list of FenixAction: The available actions.
-        """
-        return self.parent.actions()
+    #     Returns:
+    #         list of FenixAction: The available actions.
+    #     """
+    #     return self.parent.actions()
 
     def result(self, action):
         """
