@@ -28,12 +28,16 @@ class ObsFenixState:
         self._has_general              = [0,0]
         self._has_soldier              = [0,0]
         self._has_token                = [0,0]
-        self._could_create_general     = [0,0]
         self._could_create_king        = [0,0]
+        self._could_create_general     = [0,0]
         self._protected_king           = [0,0]
         self._protected_general        = [0,0]
+        self._endang_king              = [0,0]
+        self._endang_general           = [0,0]
+        self._endang_soldier           = [0,0]
         self._mobile_general           = [0,0]
-
+        self.actions
+        
         self.compute()
     
     def has_king(self, p) :
@@ -44,9 +48,29 @@ class ObsFenixState:
         return self._has_general[(p+1)==0]
     def has_token(self, p) :
         return self._has_general[(p+1)==0]
+    
+    # TODO 
+    def could_create_king(self, p) :
+        return self._could_create_king[(p+1)==0]
+    def could_create_general(self, p) :
+        return self._could_create_general[(p+1)==0]
+    def protected_king(self, p) :
+        return self._protected_king[(p+1)==0]
+    def protected_general(self, p) :
+        return self._protected_general[(p+1)==0]
+    def endang_king(self, p) :
+        return self._endang_king[(p+1)==0]
+    def endang_general(self, p) :
+        return self._endang_general[(p+1)==0]
+    def endang_soldier(self, p) :
+        return self._endang_soldier[(p+1)==0]
+    def mobile_general(self, p) :
+        return self._mobile_general[(p+1)==0]
+    # TODO
 
     def compute(self) :
         i = 0
+        self.actions = self.actions()
         for pos1 in self.pieces :
             piece = self.pieces[pos1]
             if (piece < 0):
@@ -57,8 +81,7 @@ class ObsFenixState:
             self._has_general[i] += (piece==2)
             self._has_king   [i] += (piece==3)
 
-        #    for pos2 in self.pieces :
-
+            #for pos2 in self.pieces :
         
         for i in range(2) :
             self._has_token  [i] = self._has_token  [i] / 21

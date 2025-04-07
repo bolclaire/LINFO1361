@@ -14,7 +14,15 @@ HeuristicCoeffs = namedtuple('HeuristicCoeffs',\
                                 'has_king', 'has_king_adv', \
                                 'has_general', 'has_general_adv', \
                                 'has_soldier', 'has_soldier_adv', \
-                                'has_token', 'has_token_adv'\
+                                'has_token', 'has_token_adv',\
+                                'could_create_king', 'could_create_king_adv',\
+                                'could_create_general', 'could_create_general_adv',\
+                                'protected_king', 'protected_king_adv',\
+                                'protected_general', 'protected_general_adv',\
+                                'endang_king', 'endang_king_adv',\
+                                'endang_general', 'endang_general_adv',\
+                                'endang_soldier', 'endang_soldier_adv',\
+                                'mobile_general', 'mobile_general_adv'\
                                 ]\
                             )
 
@@ -46,14 +54,30 @@ def heuristic(coeffs : HeuristicCoeffs, state : ObsFenixState, player : int) :
     res = 0
     N = 0
     list = [\
-        (coeffs.has_king         , state.has_king    (p)),    \
-        (coeffs.has_king_adv     , state.has_king   (-p)),    \
-        (coeffs.has_general      , state.has_general (p)),    \
-        (coeffs.has_general_adv  , state.has_general(-p)),    \
-        (coeffs.has_soldier      , state.has_soldier (p)),    \
-        (coeffs.has_soldier_adv  , state.has_soldier(-p)),    \
-        (coeffs.has_token        , state.has_token   (p)),    \
-        (coeffs.has_token_adv    , state.has_token  (-p)),    \
+        (coeffs.has_king                 , state.has_king              (p) ),    
+        (coeffs.has_king_adv             , state.has_king             (-p) ),    
+        (coeffs.has_general              , state.has_general           (p) ),    
+        (coeffs.has_general_adv          , state.has_general          (-p) ),    
+        (coeffs.has_soldier              , state.has_soldier           (p) ),    
+        (coeffs.has_soldier_adv          , state.has_soldier          (-p) ),    
+        (coeffs.has_token                , state.has_token             (p) ),    
+        (coeffs.has_token_adv            , state.has_token            (-p) ),    
+        (coeffs.could_create_king        , state.could_create_king     (p) ),   
+        (coeffs.could_create_king_adv    , state.could_create_king    (-p) ),   
+        (coeffs.could_create_general     , state.could_create_general  (p) ),   
+        (coeffs.could_create_general_adv , state.could_create_general (-p) ),   
+        (coeffs.protected_king           , state.protected_king        (p) ),   
+        (coeffs.protected_king_adv       , state.protected_king       (-p) ),   
+        (coeffs.protected_general        , state.protected_general     (p) ),   
+        (coeffs.protected_general_adv    , state.protected_general    (-p) ),   
+        (coeffs.endang_king              , state.endang_king           (p) ),   
+        (coeffs.endang_king_adv          , state.endang_king          (-p) ),   
+        (coeffs.endang_general           , state.endang_general        (p) ),   
+        (coeffs.endang_general_adv       , state.endang_general       (-p) ),   
+        (coeffs.endang_soldier           , state.endang_soldier        (p) ),   
+        (coeffs.endang_soldier_adv       , state.endang_soldier       (-p) ),   
+        (coeffs.mobile_general           , state.mobile_general        (p) ),   
+        (coeffs.mobile_general_adv       , state.mobile_general       (-p) )    
         ]
     for el in list :
         if (el[0] != None) :
@@ -73,7 +97,7 @@ def minimax(depth: int, state: ObsFenixState, player: int, is_maxing: bool, alph
     if is_maxing:
         max_eval = -float("inf")
         best_move = None
-        for action in state.actions():
+        for action in state.actions:
             child_board = state.result(action)
 
             _, eval = minimax(depth-1, child_board, player, not is_maxing, alpha, beta, evaluate)
@@ -91,7 +115,7 @@ def minimax(depth: int, state: ObsFenixState, player: int, is_maxing: bool, alph
     else:
         min_eval = float("inf")
         best_move = None
-        for action in state.actions():
+        for action in state.actions:
             child_board = state.result(action)
 
             _, eval = minimax(depth-1, child_board, player, not is_maxing, alpha, beta, evaluate)
@@ -122,8 +146,8 @@ class AlphaBetaAgent(Agent):
         # start = time.time()
         if state.turn < 10:
             if (self.starting_policy != None and len(self.starting_policy) == 5) :
-                return filter(self.starting_policy[state.turn//2], state.actions())
-            return random.choice(state.actions())
+                return filter(self.starting_policy[state.turn//2], state.actions)
+            return random.choice(state.actions)
         action, _ = minimax(depth, ObsFenixState(state), self.player, True, -float("inf"), float("inf"), self.local_heuristic)
         # print(time.time() - start)
         return action
