@@ -34,7 +34,7 @@ def sanitycheck_coeffs(coeffs:HeuristicCoeffs) :
                 raise ValueError("Heuristic coefficients should be in [0,100]")
             if (abs(el.dir) != 1) :
                 raise ValueError("Heuristic coefficients directions should be (1) or (-1)")
-    return('OK : ' + str(coeffs))
+    return ('OK : ' + str(coeffs))
 
 def heuristic(coeffs : HeuristicCoeffs, state : ObsFenixState, player : int) :
     p = player
@@ -115,9 +115,9 @@ class AlphaBetaAgent(Agent):
         return heuristic(self.coeffs, state, player)
 
     def act(self, state:FenixState, remaining_time):
-        start = time.time()
+        # start = time.time()
         if state.turn < 10:
             return random.choice(state.actions())
         action, _ = minimax(3, ObsFenixState(state), self.player, True, -float("inf"), float("inf"), self.local_heuristic)
-        print(time.time() - start)
+        # print(time.time() - start)
         return action

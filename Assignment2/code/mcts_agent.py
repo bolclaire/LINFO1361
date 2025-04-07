@@ -7,8 +7,8 @@ import time
 
 class MCTS_Tree:
     """
-        The tree structure that is used in the exploration of the game tree using mcts
-        to store the wins and total game obtained from descending in that direction
+    The tree structure that is used in the exploration of the game tree using mcts
+    to store the wins and total game obtained from descending in that direction
     """
     def __init__(self, state: FenixState, c_param = 1.4142, parent = None):
         self.state: FenixState = state
