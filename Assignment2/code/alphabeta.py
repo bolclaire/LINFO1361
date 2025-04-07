@@ -4,6 +4,7 @@ from observed import ObsFenixState
 import random
 import time
 from collections import namedtuple
+from fenix_starting import transpose, filter
 
 depth = 10
 
@@ -107,9 +108,12 @@ def minimax(depth: int, state: ObsFenixState, player: int, is_maxing: bool, alph
 
 class AlphaBetaAgent(Agent):
 
-    def __init__(self, player, coeffs:HeuristicCoeffs) :
+    def __init__(self, player, coeffs:HeuristicCoeffs, starting_policy:list[FenixAction] = None) :
         Agent.__init__(self, player)
         self.coeffs = coeffs
+        self.starting_policy = starting_policy
+        if (player == -1) :
+            self.starting_policy = transpose(self.starting_policy)
 
     def local_heuristic(self, state, player) :
         return heuristic(self.coeffs, state, player)
@@ -117,6 +121,8 @@ class AlphaBetaAgent(Agent):
     def act(self, state:FenixState, remaining_time):
         # start = time.time()
         if state.turn < 10:
+            if (self.starting_policy != None and len(self.starting_policy) == 5) :
+                return filter(self.starting_policy[state.turn//2], state.actions())
             return random.choice(state.actions())
         action, _ = minimax(3, ObsFenixState(state), self.player, True, -float("inf"), float("inf"), self.local_heuristic)
         # print(time.time() - start)
