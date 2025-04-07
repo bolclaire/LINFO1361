@@ -6,7 +6,7 @@ import time
 from collections import namedtuple
 from fenix_starting import transpose, filter
 
-depth = 10
+depth = 3
 
 Coeff = namedtuple('Coeff',['coeff','dir'])
 HeuristicCoeffs = namedtuple('HeuristicCoeffs',\
@@ -124,6 +124,6 @@ class AlphaBetaAgent(Agent):
             if (self.starting_policy != None and len(self.starting_policy) == 5) :
                 return filter(self.starting_policy[state.turn//2], state.actions())
             return random.choice(state.actions())
-        action, _ = minimax(3, ObsFenixState(state), self.player, True, -float("inf"), float("inf"), self.local_heuristic)
+        action, _ = minimax(depth, ObsFenixState(state), self.player, True, -float("inf"), float("inf"), self.local_heuristic)
         # print(time.time() - start)
         return action
