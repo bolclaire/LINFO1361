@@ -92,7 +92,7 @@ def mutate(individual) -> list[HeuristicCoeffs,list[FenixAction]]:
     for i in range(ACTION_NUMBER-2):
         if random.random() < MUTATION_RATE:
             new_action = random_action_general()
-            while not is_compatible(new_action, individual[COEFFS_NUMBER:]):
+            while not is_compatible(new_action, individual[1]):
                 new_action = random_action_general()
             actions[i] = new_action
         else:
