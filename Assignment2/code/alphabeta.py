@@ -49,8 +49,7 @@ def sanitycheck_coeffs(coeffs:HeuristicCoeffs) :
                 raise ValueError("Heuristic coefficients directions should be (1) or (-1)")
     return ('OK : ' + str(coeffs))
 
-def heuristic(coeffs : HeuristicCoeffs, state : ObsFenixState, player : int) :
-    p = player
+def heuristic(coeffs : HeuristicCoeffs, state : ObsFenixState, p : int) :
     if (state.is_terminal) :
         return(101*state.utility(p))
     res = 0
@@ -74,14 +73,14 @@ def heuristic(coeffs : HeuristicCoeffs, state : ObsFenixState, player : int) :
         (coeffs.protected_general_adv    , state.protected_general    (-p) ),
         (coeffs.endangered               , state.endangered            (p) ),
         (coeffs.endangered_adv           , state.endangered           (-p) ),
-        (coeffs.mobile_general           , state.mobile_general        (p) ),   
-        (coeffs.mobile_general_adv       , state.mobile_general       (-p) )    
-        # (coeffs.endang_king              , state.endang_king           (p) ),   
-        # (coeffs.endang_king_adv          , state.endang_king          (-p) ),   
-        # (coeffs.endang_general           , state.endang_general        (p) ),   
-        # (coeffs.endang_general_adv       , state.endang_general       (-p) ),   
-        # (coeffs.endang_soldier           , state.endang_soldier        (p) ),   
-        # (coeffs.endang_soldier_adv       , state.endang_soldier       (-p) ),   
+        (coeffs.mobile_general           , state.mobile_general        (p) ),
+        (coeffs.mobile_general_adv       , state.mobile_general       (-p) )
+        # (coeffs.endang_king              , state.endang_king           (p) ),
+        # (coeffs.endang_king_adv          , state.endang_king          (-p) ),
+        # (coeffs.endang_general           , state.endang_general        (p) ),
+        # (coeffs.endang_general_adv       , state.endang_general       (-p) ),
+        # (coeffs.endang_soldier           , state.endang_soldier        (p) ),
+        # (coeffs.endang_soldier_adv       , state.endang_soldier       (-p) ),
     ]
     for el in list :
         if (el[0] != None) :
@@ -113,8 +112,7 @@ class AlphaBetaAgent(Agent):
                 return random.choice(state.actions)
             return self.setup_turns(state)
         else:
-            action, score = self.minimax(self.max_depth, state, True, float("-inf"), float("inf"))
-            # print(score)
+            action, _ = self.minimax(self.max_depth, state, True, float("-inf"), float("inf"))
             return action
     
     def setup_turns(self, state:ObsFenixState):
@@ -122,12 +120,7 @@ class AlphaBetaAgent(Agent):
         for state_action in state.actions:
             if action.start == state_action.start and action.end == state_action.end:
                 return state_action
-
-        # if state.pieces.get(action.start) == self.player and (state.pieces.get(action.end) == self.player or state.pieces.get(action.end) == 2*self.player):
-        #     return action
         
-        # print(f"{state.turn//2}: {action}")
-        # print(f"{self.starting_policy}")
         return random.choice(state.actions)
 
     def minimax(self, depth: int, state: ObsFenixState, is_maxing: bool, alpha, beta) -> tuple[FenixAction, float]:
