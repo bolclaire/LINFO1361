@@ -117,6 +117,9 @@ class AlphaBetaAgent(Agent):
         action = self.starting_policy[state.turn//2]
         if state.pieces.get(action.start) == self.player and (state.pieces.get(action.end) == self.player or state.pieces.get(action.end) == 2*self.player):
             return action
+        
+        # print(f"{state.turn//2}: {action}")
+        # print(f"{self.starting_policy}")
         return random.choice(state.actions)
 
 def minimax(depth: int, state: ObsFenixState, player: int, is_maxing: bool, alpha, beta, evaluate) -> tuple[FenixAction, float]:

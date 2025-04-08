@@ -27,7 +27,7 @@ def random_action_general() -> FenixAction:
     return FenixAction(start, end, frozenset())
 
 def random_action_king() -> tuple[FenixAction, FenixAction]:
-    end_choices = [(i,j) for i in range(5) for j in range(6-i)]
+    end_choices = [(i,j) for i in range(5) for j in range(5-i)]
     end = random.choice(end_choices)
 
     start_choices = [(end[0]+1, end[1]), (end[0], end[1]+1), (end[0]-1, end[1]), (end[0], end[1]-1)]
@@ -36,10 +36,13 @@ def random_action_king() -> tuple[FenixAction, FenixAction]:
         start1 = random.choice(start_choices)
     
     start2 = random.choice(start_choices)
-    while (0 > start1[0]) or (0 > start1[1]) or (start1[0]+start1[1] > 5) or (start1 == start2):
+    while (0 > start2[0]) or (0 > start2[1]) or (start2[0]+start2[1] > 5) or (start1 == start2):
         start2 = random.choice(start_choices)
+
+    # if start1[0] < 0 or start1[1] < 0 or start2[0] < 0 or start2[1] < 0 or end[0] < 0 or end[1] < 0:
+    #     print(start1, start2, end)
     
-    return [FenixAction(start1, end, None), FenixAction(start2, end, None)]
+    return [FenixAction(start1, end, frozenset()), FenixAction(start2, end, frozenset())]
 
 def is_compatible(action: FenixAction, list: list[FenixAction|None]) -> bool:
     for item in list:
@@ -62,7 +65,7 @@ def random_individual() -> list[HeuristicCoeffs,list[FenixAction]]:
 
     
     king_actions = random_action_king()
-    while not is_compatible(king_actions[0], actions) and not is_compatible(king_actions[1], actions):
+    while not is_compatible(king_actions[0], actions) or not is_compatible(king_actions[1], actions):
         king_actions = random_action_king()
 
     return [res, actions + king_actions]
@@ -70,8 +73,8 @@ def random_individual() -> list[HeuristicCoeffs,list[FenixAction]]:
 def fitness(i):
     return Win_Table[i]
 
-def select(population):
-    return max(random.sample(population, 3), key=fitness)
+def select(i: list[int]):
+    return max(random.sample(i, 3), key=fitness)
 
 def crossover(parent1, parent2):
     return [HeuristicCoeffs(*[random.choice([parent1[0][i], parent2[0][i]]) for i in range(COEFFS_NUMBER)]), random.choice([parent1[1], parent2[1]])]
@@ -97,8 +100,8 @@ def mutate(individual) -> list[HeuristicCoeffs,list[FenixAction]]:
     
     if random.random() < MUTATION_RATE:
         new_actions = random_action_king()
-        while not is_compatible(new_actions[0], individual[COEFFS_NUMBER:COEFFS_NUMBER+ACTION_NUMBER-1]) \
-                and not is_compatible(new_actions[1], individual[COEFFS_NUMBER:COEFFS_NUMBER+ACTION_NUMBER-1]):
+        while not is_compatible(new_actions[0], individual[1]) \
+                or not is_compatible(new_actions[1], individual[1]):
             new_actions = random_action_king()
         actions[ACTION_NUMBER-2] = new_actions[0]
         actions[ACTION_NUMBER-1] = new_actions[1]
@@ -110,7 +113,7 @@ def mutate(individual) -> list[HeuristicCoeffs,list[FenixAction]]:
     
 
 # Run it!
-population = [random_individual() for _ in range(POP_SIZE)]
+population: list[list[HeuristicCoeffs, list[FenixAction]]] = [random_individual() for _ in range(POP_SIZE)]
 for generation in range(GENERATIONS):
 
     Win_Table = [0 for _ in population]
@@ -146,8 +149,8 @@ for generation in range(GENERATIONS):
 
     next_gen = [None] * POP_SIZE
     for i in range(POP_SIZE):
-        parent1 = select(population)
-        parent2 = select(population)
+        parent1 = population[select(range(POP_SIZE))]
+        parent2 = population[select(range(POP_SIZE))]
         child = crossover(parent1, parent2)
         child = mutate(child)
         next_gen[i] = child
