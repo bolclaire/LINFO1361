@@ -62,9 +62,24 @@ class ObsFenixState:
     def mobile_general(self, p):
         return self._mobile_general[(p+1)==0]
     
-    # "i" should be in for loop 
+    def sorting_weight(self, action: FenixAction):
+        if action.removed: # no sorting for capture moves
+            return 0
+        if abs(self.parent.pieces.get(action.start, default=0)) == 1:
+            if abs(self.parent.pieces.get(action.end, default=0)) == 1:
+                return 3
+            if abs(self.parent.pieces.get(action.end, default=0)) == 2:
+                return 4
+            return 0
+        if abs(self.parent.pieces.get(action.start, default=0)) == 2:
+            return 2 + (abs(action.end[0] - action.start[0]) + abs(action.end[1] - action.start[1]))/10
+        if abs(self.parent.pieces.get(action.start, default=0)) == 3:
+            return 1
+        return 0
+    
     def compute(self) :
-        self.actions = self.parent.actions()
+        self.actions: list[FenixAction] = self.parent.actions()
+        self.actions.sort(key = self.sorting_weight, reverse=True)
         for pos1 in self.pieces :
             i = 0
             piece = self.pieces[pos1]

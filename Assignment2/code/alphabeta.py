@@ -113,22 +113,28 @@ class AlphaBetaAgent(Agent):
             return action
     
     def setup_turns(self, state:ObsFenixState):
-        # on suppose que si self.starting policy != None alors il est une liste de taille 5
         action = self.starting_policy[state.turn//2]
-        if state.pieces.get(action.start) == self.player and (state.pieces.get(action.end) == self.player or state.pieces.get(action.end) == 2*self.player):
-            return action
+        for state_action in state.actions:
+            if action.start == state_action.start and action.end == state_action.end:
+                return state_action
+
+        # if state.pieces.get(action.start) == self.player and (state.pieces.get(action.end) == self.player or state.pieces.get(action.end) == 2*self.player):
+        #     return action
         
         # print(f"{state.turn//2}: {action}")
         # print(f"{self.starting_policy}")
         return random.choice(state.actions)
 
 def minimax(depth: int, state: ObsFenixState, player: int, is_maxing: bool, alpha, beta, evaluate) -> tuple[FenixAction, float]:
-    if state.is_terminal() or depth == 0:
+    # if state.is_terminal() or depth == 0:
+    #     return None, evaluate(state, player) if is_maxing else evaluate(state, -player)
+
+    if state.is_terminal():
         return None, evaluate(state, player) if is_maxing else evaluate(state, -player)
-    # if depth == 0:
-    #     if not state.actions[0].removed:
-    #         return None, evaluate(state, player) if is_maxing else evaluate(state, -player)
-    #     depth = 1
+    if depth == 0:
+        if not state.actions[0].removed:
+            return None, evaluate(state, player) if is_maxing else evaluate(state, -player)
+        depth = 1
     
     if is_maxing:
         max_eval = float("-inf")
