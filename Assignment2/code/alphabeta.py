@@ -51,10 +51,8 @@ def sanitycheck_coeffs(coeffs:HeuristicCoeffs) :
 
 def heuristic(coeffs : HeuristicCoeffs, state : ObsFenixState, player : int) :
     p = player
-    if (state.utility(p) == 1) :
-        return 101
-    if (state.utility(p) == -1) :
-        return -1
+    if (state.is_terminal) :
+        return(101*state.utility(p))
     res = 0
     N = 0
     list = [
