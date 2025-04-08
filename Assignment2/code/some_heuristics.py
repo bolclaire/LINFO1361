@@ -1,5 +1,10 @@
 from alphabeta import *
 
+starting_policy = [FenixAction(start=(3, 0), end=(2, 0), removed=frozenset()), FenixAction(start=(4, 1), end=(3, 1), removed=frozenset()), FenixAction(start=(1, 1), end=(1, 0), removed=frozenset()), FenixAction(start=(1, 3), end=(0, 3), removed=frozenset()), FenixAction(start=(0, 4), end=(0, 3), removed=frozenset())]
+
+H0 = init_coeffs()
+H0 = mod_coeffs(H0, {'has_king' : Coeff(100,1)})
+
 H1 = init_coeffs()
 h1 = {
     'has_king'        : Coeff(100,1),

@@ -1,14 +1,10 @@
-from random_agent import RandomAgent
-from mcts import MCTS
-from alphabeta import AlphaBetaAgent
-from visual_game_manager import VisualGameManager
-from game_manager import TextGameManager
-from some_heuristics import H1, H2, H3
+from utils import *
 
-agent1 = [AlphaBetaAgent(1, H2, None), AlphaBetaAgent(1, H3, None), MCTS(1, 1.414213)]
-agent2 = [AlphaBetaAgent(-1, H2, None), AlphaBetaAgent(-1, H3, None), MCTS(-1, 1.414213)]
+agent = lambda p : [RandomAgent(p), AlphaBetaAgent(p, H0, None, depth=3)]
+n = 2
 
-n = 3
+agent1 = agent(1)
+agent2 = agent(-1)
 counts = [0]*n
 wins = [0]*n
 

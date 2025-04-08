@@ -115,7 +115,7 @@ class ObsFenixState:
     def compute(self) :
         self.actions.sort(key = self.sorting_weight, reverse=True)
         
-        if (len(self.actions[0].removed) > 0) :
+        if (len(self.actions) > 0 and len(self.actions[0].removed) > 0) :
             self._endangered[-self.current_player] = 1
 
         for pos1 in self.pieces :
