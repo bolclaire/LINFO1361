@@ -25,16 +25,4 @@ H2 = mod_coeffs(H2, h2)
 
 
 # stolen from best_individuals.txt
-l = [73.53883823978077, 23.913397441385687, 61.83680266821058, 62.930308662035, 42.317541779535595, 59.98406148162106, 47.07590897054057, 19.724589301871788]
-H3 = init_coeffs()
-modif = {}
-modif['has_king']           = Coeff(l[0], 1)
-modif['has_king_adv']       = Coeff(l[1],-1)
-modif['has_general']        = Coeff(l[2], 1)
-modif['has_general_adv']    = Coeff(l[3],-1)
-modif['has_soldier']        = Coeff(l[4], 1)
-modif['has_soldier_adv']    = Coeff(l[5],-1)
-modif['has_token']          = Coeff(l[6], 1)
-modif['has_token_adv']      = Coeff(l[7],-1)
-
-H3 = mod_coeffs(H3, modif)
+H3 = HeuristicCoeffs(has_king=Coeff(coeff=98.97015270098784, dir=1), has_king_adv=Coeff(coeff=90.24755918524377, dir=-1), has_general=Coeff(coeff=26.4118840340106, dir=1), has_general_adv=Coeff(coeff=91.60985325675675, dir=-1), has_soldier=Coeff(coeff=66.03196141650939, dir=1), has_soldier_adv=Coeff(coeff=97.3074182032409, dir=-1), has_token=Coeff(coeff=85.04899553014418, dir=1), has_token_adv=Coeff(coeff=9.040164787865635, dir=-1), could_create_king=Coeff(coeff=53.771769652841996, dir=1), could_create_king_adv=Coeff(coeff=99.66698048550036, dir=-1), could_create_general=Coeff(coeff=11.760564497117354, dir=1), could_create_general_adv=Coeff(coeff=29.67039546094593, dir=-1), protected_king=Coeff(coeff=15.023760456655399, dir=1), protected_king_adv=Coeff(coeff=51.057662893842334, dir=-1), protected_general=Coeff(coeff=72.0919145613403, dir=1), protected_general_adv=Coeff(coeff=0.2511022759517645, dir=-1), mobile_general=Coeff(coeff=59.655342414043055, dir=1), mobile_general_adv=Coeff(coeff=51.19732747689507, dir=-1), endangered=None, endangered_adv=None)

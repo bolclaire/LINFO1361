@@ -1,9 +1,9 @@
 import random
-import time
 from collections import namedtuple
 from agent import Agent
 from fenix import FenixState, FenixAction
 from observed import ObsFenixState
+# from fenix_starting import transpose REWROTE, filter ?
 
 Coeff = namedtuple('Coeff',['coeff','dir'])
 HeuristicCoeffs = namedtuple('HeuristicCoeffs',
@@ -16,14 +16,17 @@ HeuristicCoeffs = namedtuple('HeuristicCoeffs',
                                 'could_create_general', 'could_create_general_adv',
                                 'protected_king', 'protected_king_adv',
                                 'protected_general', 'protected_general_adv',
-                                'endang_king', 'endang_king_adv',
-                                'endang_general', 'endang_general_adv',
-                                'endang_soldier', 'endang_soldier_adv',
+                                'endangered', 'endangered_adv',
                                 'mobile_general', 'mobile_general_adv'
+                                # 'endang_king', 'endang_king_adv',
+                                # 'endang_general', 'endang_general_adv',
+                                # 'endang_soldier', 'endang_soldier_adv'
                                 ]
                             )
 
 def transpose(action_list: list[FenixAction]) -> list[FenixAction]:
+    if (action_list == None) :
+        return None
     corner = (6,7) # dim = (7,8)
     return [FenixAction((corner[0]-action.start[0], corner[1]-action.start[1]), (corner[0]-action.end[0], corner[1]-action.end[1]), frozenset()) for action in action_list]
 
@@ -51,7 +54,7 @@ def heuristic(coeffs : HeuristicCoeffs, state : ObsFenixState, player : int) :
     if (state.utility(p) == 1) :
         return 101
     if (state.utility(p) == -1) :
-        return 0
+        return -1
     res = 0
     N = 0
     list = [
@@ -71,14 +74,16 @@ def heuristic(coeffs : HeuristicCoeffs, state : ObsFenixState, player : int) :
         (coeffs.protected_king_adv       , state.protected_king       (-p) ),
         (coeffs.protected_general        , state.protected_general     (p) ),
         (coeffs.protected_general_adv    , state.protected_general    (-p) ),
-        (coeffs.endang_king              , state.endang_king           (p) ),
-        (coeffs.endang_king_adv          , state.endang_king          (-p) ),
-        (coeffs.endang_general           , state.endang_general        (p) ),
-        (coeffs.endang_general_adv       , state.endang_general       (-p) ),
-        (coeffs.endang_soldier           , state.endang_soldier        (p) ),
-        (coeffs.endang_soldier_adv       , state.endang_soldier       (-p) ),
-        (coeffs.mobile_general           , state.mobile_general        (p) ),
-        (coeffs.mobile_general_adv       , state.mobile_general       (-p) )
+        (coeffs.endangered               , state.endangered            (p) ),
+        (coeffs.endangered_adv           , state.endangered           (-p) ),
+        (coeffs.mobile_general           , state.mobile_general        (p) ),   
+        (coeffs.mobile_general_adv       , state.mobile_general       (-p) )    
+        # (coeffs.endang_king              , state.endang_king           (p) ),   
+        # (coeffs.endang_king_adv          , state.endang_king          (-p) ),   
+        # (coeffs.endang_general           , state.endang_general        (p) ),   
+        # (coeffs.endang_general_adv       , state.endang_general       (-p) ),   
+        # (coeffs.endang_soldier           , state.endang_soldier        (p) ),   
+        # (coeffs.endang_soldier_adv       , state.endang_soldier       (-p) ),   
     ]
     for el in list :
         if (el[0] != None) :
@@ -87,7 +92,7 @@ def heuristic(coeffs : HeuristicCoeffs, state : ObsFenixState, player : int) :
             score = el[1]
             if (dir == -1) :
                 score = 1 - score
-            N += 1
+            N += (coeff != 0)
             res += coeff * score
     return res/N
 
@@ -127,10 +132,10 @@ class AlphaBetaAgent(Agent):
         return random.choice(state.actions)
 
 def minimax(depth: int, state: ObsFenixState, player: int, is_maxing: bool, alpha, beta, evaluate) -> tuple[FenixAction, float]:
-    # if state.is_terminal() or depth == 0:
+    # if state.is_terminal or depth == 0:
     #     return None, evaluate(state, player)
 
-    if state.is_terminal():
+    if state.is_terminal:
         return None, evaluate(state, player)
     if depth == 0:
         if not state.actions[0].removed:

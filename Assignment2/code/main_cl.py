@@ -5,8 +5,8 @@ from visual_game_manager import VisualGameManager
 from game_manager import TextGameManager
 from some_heuristics import H1, H2, H3
 
-agent1 = [AlphaBetaAgent(1, H2), AlphaBetaAgent(1, H3), MCTS(1, 1.414213)]
-agent2 = [AlphaBetaAgent(-1, H2), AlphaBetaAgent(-1, H3), MCTS(-1, 1.414213)]
+agent1 = [AlphaBetaAgent(1, H2, None), AlphaBetaAgent(1, H3, None), MCTS(1, 1.414213)]
+agent2 = [AlphaBetaAgent(-1, H2, None), AlphaBetaAgent(-1, H3, None), MCTS(-1, 1.414213)]
 
 n = 3
 counts = [0]*n
