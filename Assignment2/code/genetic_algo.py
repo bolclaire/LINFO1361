@@ -1,16 +1,14 @@
 import random
 from game_manager import *
 from alphabeta import *
-from mcts import MCTS
 
 # Parameters
 POP_SIZE = 50
 MUTATION_RATE = 0.02
 GENERATIONS = 10000
-COEFFS_NUMBER = 24
+COEFFS_NUMBER = 20
 ACTION_NUMBER = 5
-FIGHT_NUMBER = 10
-MCTS_AGENT = MCTS(1, 1.4142)
+FIGHT_NUMBER = 5
 Win_Table = []
 
 def base_coeff() -> float:
@@ -26,7 +24,7 @@ def random_action_general() -> FenixAction:
     
     return FenixAction(start, end, frozenset())
 
-def random_action_king() -> tuple[FenixAction, FenixAction]:
+def random_action_king() -> list[FenixAction]:
     end_choices = [(i,j) for i in range(5) for j in range(5-i)]
     end = random.choice(end_choices)
 
@@ -52,11 +50,11 @@ def is_compatible(action: FenixAction, list: list[FenixAction|None]) -> bool:
             return False
     return True
 
-def random_individual() -> list[HeuristicCoeffs,list[FenixAction]]:
+def random_individual() -> list[HeuristicCoeffs|list[FenixAction]]:
     l = [Coeff(base_coeff(), 1-2*(i%2)) for i in range(COEFFS_NUMBER)]
     res = HeuristicCoeffs(*l)
     
-    actions: list[FenixAction|None] = [None] * (ACTION_NUMBER-2)
+    actions: list[FenixAction] = [None] * (ACTION_NUMBER-2)
     for i in range(ACTION_NUMBER-2):
         new_action = random_action_general()
         while not is_compatible(new_action, actions):
@@ -80,7 +78,7 @@ def crossover(parent1, parent2):
     return [HeuristicCoeffs(*[random.choice([parent1[0][i], parent2[0][i]]) for i in range(COEFFS_NUMBER)]), random.choice([parent1[1], parent2[1]])]
 
 # Mutation: randomly change some characters
-def mutate(individual) -> list[HeuristicCoeffs,list[FenixAction]]:
+def mutate(individual) -> list[HeuristicCoeffs|list[FenixAction]]:
     coeffs = [None] * COEFFS_NUMBER
     for i in range(COEFFS_NUMBER):
         if random.random() < MUTATION_RATE:
@@ -113,7 +111,7 @@ def mutate(individual) -> list[HeuristicCoeffs,list[FenixAction]]:
     
 
 # Run it!
-population: list[list[HeuristicCoeffs, list[FenixAction]]] = [random_individual() for _ in range(POP_SIZE)]
+population: list[list[HeuristicCoeffs|list[FenixAction]]] = [random_individual() for _ in range(POP_SIZE)]
 for generation in range(GENERATIONS):
 
     Win_Table = [0 for _ in population]
@@ -133,10 +131,6 @@ for generation in range(GENERATIONS):
                 win_p1, win_p2 = TextGameManager(agent_1=p1_agents[j], agent_2=p2_agents[i], display=False).play()
                 if win_p2 == 1:
                     Win_Table[i] += 1
-            
-            # win_p1, win_p2 = TextGameManager(agent_1=MCTS_AGENT, agent_2=p2_agents[i], display=False).play()
-            # if win_p2 == 1:
-            #     Win_Table[tuple(population[i])] += 8
     
     sorted_indexes = sorted(range(POP_SIZE), key=fitness, reverse=True)
     best = population[sorted_indexes[0]]
