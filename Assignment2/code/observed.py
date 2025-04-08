@@ -65,15 +65,15 @@ class ObsFenixState:
     def sorting_weight(self, action: FenixAction):
         if action.removed: # no sorting for capture moves
             return 0
-        if abs(self.parent.pieces.get(action.start, default=0)) == 1:
-            if abs(self.parent.pieces.get(action.end, default=0)) == 1:
+        if abs(self.parent.pieces.get(action.start, 0)) == 1:
+            if abs(self.parent.pieces.get(action.end, 0)) == 1:
                 return 3
-            if abs(self.parent.pieces.get(action.end, default=0)) == 2:
+            if abs(self.parent.pieces.get(action.end, 0)) == 2:
                 return 4
             return 0
-        if abs(self.parent.pieces.get(action.start, default=0)) == 2:
+        if abs(self.parent.pieces.get(action.start, 0)) == 2:
             return 2 + (abs(action.end[0] - action.start[0]) + abs(action.end[1] - action.start[1]))/10
-        if abs(self.parent.pieces.get(action.start, default=0)) == 3:
+        if abs(self.parent.pieces.get(action.start, 0)) == 3:
             return 1
         return 0
     

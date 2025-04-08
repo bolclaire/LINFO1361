@@ -94,13 +94,13 @@ def heuristic(coeffs : HeuristicCoeffs, state : ObsFenixState, player : int) :
 class AlphaBetaAgent(Agent):
     def __init__(self, player, coeffs:HeuristicCoeffs, starting_policy:list[FenixAction]) :
         Agent.__init__(self, player)
-        self.depth = 3
+        self.depth = 5
         self.coeffs = coeffs
         if (player == 1):
             self.starting_policy = starting_policy
         else:
             self.starting_policy = transpose(starting_policy)
-        self.heuristic = lambda x,y: heuristic(self.coeffs, x, -y)
+        self.heuristic = lambda x,y: heuristic(self.coeffs, x, y)
         
     def act(self, base_state: FenixState, remaing_time):
         state = ObsFenixState(base_state)
@@ -109,7 +109,8 @@ class AlphaBetaAgent(Agent):
                 return random.choice(state.actions)
             return self.setup_turns(state)
         else:
-            action, _ = minimax(self.depth, state, self.player, True, float("-inf"), float("inf"), self.heuristic)
+            action, score = minimax(self.depth, state, self.player, True, float("-inf"), float("inf"), self.heuristic)
+            print(score)
             return action
     
     def setup_turns(self, state:ObsFenixState):
@@ -127,13 +128,13 @@ class AlphaBetaAgent(Agent):
 
 def minimax(depth: int, state: ObsFenixState, player: int, is_maxing: bool, alpha, beta, evaluate) -> tuple[FenixAction, float]:
     # if state.is_terminal() or depth == 0:
-    #     return None, evaluate(state, player) if is_maxing else evaluate(state, -player)
+    #     return None, evaluate(state, player)
 
     if state.is_terminal():
-        return None, evaluate(state, player) if is_maxing else evaluate(state, -player)
+        return None, evaluate(state, player)
     if depth == 0:
         if not state.actions[0].removed:
-            return None, evaluate(state, player) if is_maxing else evaluate(state, -player)
+            return None, evaluate(state, player)
         depth = 1
     
     if is_maxing:
