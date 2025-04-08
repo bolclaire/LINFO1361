@@ -53,7 +53,7 @@ def heuristic(coeffs : HeuristicCoeffs, state : ObsFenixState, player : int) :
         return 0
     res = 0
     N = 0
-    list = [\
+    list = [
         (coeffs.has_king                 , state.has_king              (p) ),    
         (coeffs.has_king_adv             , state.has_king             (-p) ),    
         (coeffs.has_general              , state.has_general           (p) ),    
@@ -78,7 +78,7 @@ def heuristic(coeffs : HeuristicCoeffs, state : ObsFenixState, player : int) :
         (coeffs.endang_soldier_adv       , state.endang_soldier       (-p) ),   
         (coeffs.mobile_general           , state.mobile_general        (p) ),   
         (coeffs.mobile_general_adv       , state.mobile_general       (-p) )    
-        ]
+    ]
     for el in list :
         if (el[0] != None) :
             coeff = el[0].coeff
@@ -91,11 +91,15 @@ def heuristic(coeffs : HeuristicCoeffs, state : ObsFenixState, player : int) :
     return res/N
 
 def minimax(depth: int, state: ObsFenixState, player: int, is_maxing: bool, alpha, beta, evaluate) -> tuple[FenixAction, float]:
-    if depth == 0 or state.is_terminal():
+    if state.is_terminal():
+        return None, evaluate(state, player) if is_maxing else evaluate(state, -player)
+    if depth == 0:
+        if state.actions[0].removed:
+            return minimax(1, state, player, is_maxing, alpha, beta, evaluate)
         return None, evaluate(state, player) if is_maxing else evaluate(state, -player)
     
     if is_maxing:
-        max_eval = -float("inf")
+        max_eval = float("-inf")
         best_move = None
         for action in state.actions:
             child_board = state.result(action)
@@ -144,10 +148,11 @@ class AlphaBetaAgent(Agent):
 
     def act(self, state:FenixState, remaining_time):
         # start = time.time()
+        new_state = ObsFenixState(state)
         if state.turn < 10:
             if (self.starting_policy != None and len(self.starting_policy) == 5) :
-                return filter(self.starting_policy[state.turn//2], state.actions())
-            return random.choice(state.actions())
-        action, _ = minimax(depth, ObsFenixState(state), self.player, True, -float("inf"), float("inf"), self.local_heuristic)
+                return filter(self.starting_policy[new_state.turn//2], new_state.actions)
+            return random.choice(new_state.actions)
+        action, _ = minimax(depth, new_state, self.player, True, float("-inf"), float("inf"), self.local_heuristic)
         # print(time.time() - start)
         return action

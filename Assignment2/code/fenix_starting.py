@@ -35,4 +35,5 @@ def filter(action : FenixAction, actions : list[FenixAction]) :
     for valid_action in actions :
         if (valid_action.start == action.start and valid_action.end == action.end) :
             return valid_action
+    print(1)
     return random.choice(actions)

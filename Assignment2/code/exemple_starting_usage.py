@@ -18,8 +18,8 @@ To know about starting policy :
 -> transpose is done inside the AlphaBetaAgent class when player == -1
 """
 
-agent1 = AlphaBetaAgent(1, H, starting_policy=starting_policy)
-agent2 = AlphaBetaAgent(-1, H, starting_policy=starting_policy)
+agent1 = AlphaBetaAgent(1, H, starting_policy)
+agent2 = AlphaBetaAgent(-1, H, starting_policy)
 
 NewGame = VisualGameManager(agent1, agent2)
 NewGame.play()

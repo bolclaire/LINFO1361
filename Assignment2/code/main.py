@@ -1,23 +1,21 @@
 import random_agent
 import mcts_agent as agent
 import alphabeta as agentab
+from fenix import FenixAction
 from visual_game_manager import *
 from game_manager import *
 
 red_win = 0
 black_win = 0
 # while True:
-l = [70.59303712922738, 76.91004499220043, 14.609115765518233, 35.82213382182533, 46.19763187555361, 75.19539794541124, 40.839966583315956, 83.41675795806043]
-coeffs = agentab.HeuristicCoeffs(agentab.Coeff(l[0],-1),
-                                 agentab.Coeff(l[1], 1),
-                                 agentab.Coeff(l[2],-1),
-                                 agentab.Coeff(l[3], 1),
-                                 agentab.Coeff(l[4],-1),
-                                 agentab.Coeff(l[5], 1),
-                                 agentab.Coeff(l[6],-1),
-                                 agentab.Coeff(l[7], 1))
+l1 = [99.543787436251124, 79.3385853692131, 46.079367221239444, 6.904992705715718, 91.62524215350562, 15.406646819410275, 28.67630624830364, 79.34432967920961, 58.2728511119195, 62.7110088690252, 2.3517504625701235, 52.32354657126979, 91.03349863883973, 37.97383474526717, 34.539488418966336, 29.914033425014676, 52.73385434133494, 12.191930361298231, 6.585715520292013, 6.572799042541422, 24.460297043781253, 28.1093497290153, 32.10443965059325, 36.653557758343155]
+coeffs1 = agentab.HeuristicCoeffs(*[agentab.Coeff(l1[i], 1-2*(i%2)) for i in range(len(l1))])
 
-VisualGameManager(red_agent=agentab.AlphaBetaAgent(1, coeffs), black_agent=agent.MCTS(-1, 1.4142)).play()
+l2 = [46.046469647000386, 94.48714339813093, 79.4955626207432, 76.44007403640273, 66.18995590317242, 98.0832138409852, 66.61007544327292, 9.00519233295477, 70.07474352562446, 58.573260970574836, 48.30829004007373, 3.1259980829838163, 46.98683661715272, 17.55253568900841, 15.563383951759258, 52.315741596660445, 46.218948392758904, 18.044262367733698, 25.02497081625067, 77.34369811909755, 5.2132358935237715, 69.37360710821481, 9.25759323923806, 34.90141812425562]
+coeffs2 = agentab.HeuristicCoeffs(*[agentab.Coeff(l2[i], 1-2*(i%2)) for i in range(len(l2))])
+
+VisualGameManager(red_agent=agentab.AlphaBetaAgent(1, coeffs1, [FenixAction((5, 1), (5, 2), None), FenixAction((3, 1), (4, 1), None), FenixAction((4, 4), (4, 5), None), FenixAction((1, 1), (1, 0), None), FenixAction((2, 0), (1, 0), None)]),
+                  black_agent=agentab.AlphaBetaAgent(-1, coeffs2, [FenixAction((4, 1), (4, 0), None), FenixAction((0, 0), (0, 1), None), FenixAction((4, 2), (4, 3), None), FenixAction((2, 1), (1, 1), None), FenixAction((1, 0), (1, 1), None)])).play()
 # Rwin, Bwin = TextGameManager(agent_1=agent.MCTS(1, c_param = 1), agent_2=agent.MCTS(-1, c_param = 1.4142), display=False).play()
 # red_win += 1 if Rwin == 1 else 0
 # black_win += 1 if Bwin == 1 else 0

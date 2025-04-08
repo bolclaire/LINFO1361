@@ -9,16 +9,14 @@ MUTATION_RATE = 0.01
 GENERATIONS = 10000
 COEFFS_NUMBER = 24
 ACTION_NUMBER = 5
-FIGHT_NUMBER = 5
+FIGHT_NUMBER = 10
 MCTS_AGENT = MCTS(1, 1.4142)
 Win_Table = {}
 
 def list_to_coeffs(l: list[float]) -> HeuristicCoeffs:
     l = [Coeff(l[i], 1-2*(i%2)) for i in range(COEFFS_NUMBER)]
-    base_tuple = HeuristicCoeffs(*l)
 
-    # print(base_tuple)
-    return base_tuple
+    return HeuristicCoeffs(*l)
 
 def base_coeff() -> float:
     return 100*random.random()
@@ -31,7 +29,7 @@ def random_action_general() -> FenixAction:
     while 0 > end[0] or end[0] > 5 or (0 > end[1]) or (end[1] > 5):
         end = random.choice(end_choices)
     
-    return FenixAction(start, end, frozenset())
+    return FenixAction(start, end, None)
 
 def random_action_king() -> tuple[FenixAction, FenixAction]:
     end_choices = [(i,j) for i in range(5) for j in range(0,i+1)]
@@ -46,7 +44,7 @@ def random_action_king() -> tuple[FenixAction, FenixAction]:
     while (0 > start1[0]) or (0 > start1[1]) or (start1 == start2):
         start2 = random.choice(start_choices)
     
-    return FenixAction(start1, end, frozenset()), FenixAction(start2, end, frozenset())
+    return FenixAction(start1, end, None), FenixAction(start2, end, None)
 
 def is_compatible(action: FenixAction, list: list[FenixAction|None]) -> bool:
     for item in list:
@@ -83,8 +81,7 @@ def select(population):
 
 # Crossover: mix two parents
 def crossover(parent1, parent2):
-    point = random.randint(0, COEFFS_NUMBER-1)
-    return parent1[:point] + parent2[point:]
+    return [random.choice([parent1[i], parent2[i]]) for i in range(COEFFS_NUMBER)] + random.choice([parent1[COEFFS_NUMBER:], parent2[COEFFS_NUMBER:]])
 
 # Mutation: randomly change some characters
 def mutate(individual):
@@ -99,12 +96,12 @@ def mutate(individual):
                 new_action = random_action_general()
             individual[COEFFS_NUMBER+i] = new_action
     
-    # if random.random() < MUTATION_RATE:
-    new_actions = random_action_king()
-    while not is_compatible(new_actions, individual[COEFFS_NUMBER:COEFFS_NUMBER+ACTION_NUMBER-1]):
+    if random.random() < MUTATION_RATE:
         new_actions = random_action_king()
-    individual[COEFFS_NUMBER+ACTION_NUMBER-2] = new_actions[0]
-    individual[COEFFS_NUMBER+ACTION_NUMBER-1] = new_actions[1]
+        while not is_compatible(new_actions[0], individual[COEFFS_NUMBER:COEFFS_NUMBER+ACTION_NUMBER-1]) and not is_compatible(new_actions[1], individual[COEFFS_NUMBER:COEFFS_NUMBER+ACTION_NUMBER-1]):
+            new_actions = random_action_king()
+        individual[COEFFS_NUMBER+ACTION_NUMBER-2] = new_actions[0]
+        individual[COEFFS_NUMBER+ACTION_NUMBER-1] = new_actions[1]
 
     return individual
     
@@ -125,6 +122,7 @@ for generation in range(GENERATIONS):
 
                 win_p1, win_p2 = TextGameManager(agent_1=p1_agents[i], agent_2=p2_agents[j], display=False).play()
                 if win_p1 == 1:
+                    # print("p1 won")
                     Win_Table[tuple(population[i])] += 1
 
                 win_p1, win_p2 = TextGameManager(agent_1=p1_agents[j], agent_2=p2_agents[i], display=False).play()
@@ -132,15 +130,18 @@ for generation in range(GENERATIONS):
                     Win_Table[tuple(population[i])] += 1
             
             # for _ in range(3):
-            #     win_p1, win_p2 = TextGameManager(agent_1=MCTS_AGENT, agent_2=p2_agents[i], display=False).play()
-            #     if win_p2 == 1:
-            #         Win_Table[tuple(population[i])] += 3
+            win_p1, win_p2 = TextGameManager(agent_1=MCTS_AGENT, agent_2=p2_agents[i], display=False).play()
+            if win_p2 == 1:
+                Win_Table[tuple(population[i])] += 8
     
     population = sorted(population, key=fitness, reverse=True)
     best = population[0]
     print(f"Gen {generation}: {best} | Fitness: {fitness(best)}")
     with open("best_individual.txt", "a") as file:
         file.write(f"Gen {generation}: {best} | Fitness: {fitness(best)}\n")
+    with open("last_population.txt", "w") as file:
+        for individual in population:
+            file.write(str(individual) + "\n")
 
     next_gen = []
     for _ in range(POP_SIZE):
