@@ -1,5 +1,5 @@
 from random_agent import RandomAgent
-from mcts_agent import MCTS
+from mcts import MCTS
 from alphabeta import AlphaBetaAgent
 from visual_game_manager import VisualGameManager
 from game_manager import TextGameManager

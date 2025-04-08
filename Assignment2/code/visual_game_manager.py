@@ -150,6 +150,8 @@ class VisualGameManager:
                     self.remaining_time_black -= (time.perf_counter_ns() - self.start_thinking_time) * 1e-9
 
                 if self.selected_action not in self.actions:
+                    print(self.state.current_player)
+                    print(self.selected_action)
                     raise ValueError("Invalid action")
 
                 self.state = self.state.result(self.selected_action)
