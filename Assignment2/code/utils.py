@@ -5,5 +5,5 @@ from game_manager import *
 from mcts import *
 from observed import *
 from random_agent import *
-from some_heuristics import *
+from final_heuristics import *
 from visual_game_manager import *

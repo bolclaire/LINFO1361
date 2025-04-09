@@ -3,7 +3,7 @@ from collections import namedtuple
 from agent import Agent
 from fenix import FenixState, FenixAction
 from observed import ObsFenixState
-# from fenix_starting import transpose REWROTE, filter ?
+import time
 
 Coeff = namedtuple('Coeff',['coeff','dir'])
 HeuristicCoeffs = namedtuple('HeuristicCoeffs',
@@ -94,7 +94,7 @@ def heuristic(coeffs : HeuristicCoeffs, state : ObsFenixState, p : int) :
     return res/N
 
 class AlphaBetaAgent(Agent):
-    def __init__(self, player, coeffs:HeuristicCoeffs, starting_policy:list[FenixAction], depth=3, max_depth=5) :
+    def __init__(self, player, coeffs:HeuristicCoeffs, starting_policy:list[FenixAction], depth=4, max_depth=7) :
         Agent.__init__(self, player)
         self.init_depth = depth
         self.max_depth = max_depth
@@ -104,13 +104,20 @@ class AlphaBetaAgent(Agent):
         else:
             self.starting_policy = transpose(starting_policy)
         self.heuristic = lambda state : heuristic(self.coeffs, state, self.player)
+        self.time = 0
+        self.n = 0
         
     def act(self, base_state: FenixState, remaing_time):
+        t0 = time.time()
         state = ObsFenixState(base_state)
         if state.turn < 10 and self.starting_policy != None :
+            self.n += 1
+            self.time += time.time() - t0
             return self.setup_turns(state)
         else:
             action, _ = self.minimax(self.max_depth, state, True, float("-inf"), float("inf"))
+            self.n += 1
+            self.time += time.time() - t0
             return action
     
     def setup_turns(self, state:ObsFenixState):
