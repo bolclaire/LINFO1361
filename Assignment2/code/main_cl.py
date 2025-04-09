@@ -4,18 +4,13 @@ from random_agent import RandomAgent
 from mcts import MCTS
 
 from alphabeta import AlphaBetaAgent
-from some_heuristics import H0, starting_policy
+from some_heuristics import *
 
-check1 = lambda p : [RandomAgent(p), AlphaBetaAgent(p, H0, starting_policy, depth=3, max_depth=3)]
-check1_str = "[Random, Dummy AlphaBeta]"
-
-def tournoi(agents, contestants = None) :
+def tournoi(agent1, agent2, contestants = None) :
     print("Tournoi !")
     print(contestants)
     print("=================")
 
-    agent1 = agents(1)
-    agent2 = agents(-1)
     n = len(agent1)
 
     counts = [0]*n
@@ -24,10 +19,10 @@ def tournoi(agents, contestants = None) :
     while True:
         for i in range(n) :
             for j in range(n) :
-                if j != i :
-                    l = [0]*n
+                if (i!=j) :
+                    l = [-1]*n
                     l[i] = 1
-                    l[j] = 1
+                    l[j] = 2
                     print("Match: " + str(l))
                     v,w = TextGameManager(agent1[i], agent2[j], display=False).play()
                     counts[i] += 1
@@ -37,3 +32,16 @@ def tournoi(agents, contestants = None) :
                     print("Games: " + str(counts))
                     print("Wins : " + str(wins))
                     print("=================")
+
+
+my_alphabeta = lambda p,h : AlphaBetaAgent(p, h, starting_policy, depth=3, max_depth=5)
+agent1 = []
+agent2 = []
+for my_heuristic in [H3, H4, H7, H15]:
+    agent1.append(my_alphabeta(1, my_heuristic))
+    agent2.append(my_alphabeta(-1, my_heuristic))
+agent1.append(MCTS(1,1.4142))
+agent2.append(MCTS(-1,1.4142))
+contestants = "[AlphaBeta-H3, AlphaBeta-H4, AlphaBeta-H7, AlphaBeta-H15, MCTS]"
+
+tournoi(agent1, agent2, contestants)

@@ -107,9 +107,7 @@ class AlphaBetaAgent(Agent):
         
     def act(self, base_state: FenixState, remaing_time):
         state = ObsFenixState(base_state)
-        if state.turn < 10:
-            if self.starting_policy == None:
-                return random.choice(state.actions)
+        if state.turn < 10 and self.starting_policy != None :
             return self.setup_turns(state)
         else:
             action, _ = self.minimax(self.max_depth, state, True, float("-inf"), float("inf"))

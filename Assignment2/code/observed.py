@@ -160,7 +160,7 @@ class ObsFenixState:
             self._has_soldier[i] = min(self._has_soldier[i] / 12, 1)
             self._has_general[i] = min(self._has_general[i] / 3, 1)
             self._protected_general[i] = min(self._protected_general[i] / 3, 1)
-            self._mobile_general[i] = self._mobile_general[i] / 13
+            self._mobile_general[i] = self._mobile_general[i] / (3*13)
         
         return self
     
