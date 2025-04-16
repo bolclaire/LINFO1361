@@ -1,0 +1,4 @@
+- implement utility for FenixState
+- move FenixState.actions() into result to instead use a variable FenixState.action
+- add in FenixState.actions() the move to create a general or a king (i forgor ^v^) when allowed to
+- test all functions by fuzzing or just using a testing suite
